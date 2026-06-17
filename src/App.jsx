@@ -9,6 +9,7 @@ const CURRICULUM = [
     milestone: 'Build a CLI file organizer. Comfortable with loops, OOP, and file I/O.',
     resources: [
       { title: 'fCC Python for Beginners (Full Course)', url: 'https://youtu.be/rfscVS0vtbw', type: 'Video', duration: '~4.5h' },
+      { title: 'CS50 Python (Full Course)', url: 'https://youtu.be/nLRL_NcnK-4?si=qZfON26kcebEfBEw', type: 'Video', duration: '~15h' },
     ],
     topics: [
       { id: 't1_1', title: 'Variables, data types, operators', hours: 3, note: 'Strings, ints, floats, booleans, basic operations' },
@@ -642,7 +643,7 @@ function ResourcesView() {
         {CURRICULUM.map(p => (
           <button key={p.id} onClick={() => setActiveId(p.id)}
             style={{ padding: '5px 12px', borderRadius: '20px', border: `1px solid ${activeId === p.id ? 'transparent' : '#141420'}`, background: activeId === p.id ? p.color : '#0f0f1e', color: activeId === p.id ? 'white' : '#4b5563', fontSize: '11px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.15s' }}>
-            P{p.phase}
+            {p.title}
           </button>
         ))}
       </div>
