@@ -194,13 +194,14 @@ const TOTAL_HOURS = CURRICULUM.reduce((s, p) => s + p.totalHours, 0);
 // ================================================================
 // SCHEDULE GENERATION — skips done topics, splits across weeks
 // ================================================================
-function buildSchedule(weeklyHours, done = {}) {
-  if (!weeklyHours || weeklyHours <= 0) return [];
+function buildSchedule(weeklyHours, selectedPhases, done = {}) {
+  if (!weeklyHours || weeklyHours <= 0 || !selectedPhases || selectedPhases.length === 0) return [];
   const weeks = [];
   let cur = [];
   let left = parseFloat(weeklyHours.toFixed(1));
 
   for (const phase of CURRICULUM) {
+    if (!selectedPhases.includes(phase.id)) continue;
     for (const topic of phase.topics) {
       if (done[topic.id] === 'done') continue;
       let rem = topic.hours;
@@ -228,13 +229,132 @@ function buildSchedule(weeklyHours, done = {}) {
 // ================================================================
 // STORAGE HELPERS
 // ================================================================
-const SK = { settings: 'ltrk-v2-settings', progress: 'ltrk-v2-progress' };
+const SK = { settings: 'ltrk-v2-settings', progress: 'ltrk-v2-progress', selectedPhases: 'ltrk-v2-selected-phases' };
 
 async function sget(k) {
   try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; }
 }
 async function sset(k, v) {
   try { localStorage.setItem(k, JSON.stringify(v)); } catch {}
+}
+
+// ================================================================
+// TOPIC SELECTION SCREEN
+// ================================================================
+function TopicSelectionScreen({ onSave }) {
+  const [selected, setSelected] = useState(new Set());
+  const categories = [...new Set(CURRICULUM.map(p => p.category))];
+  const allPhaseIds = CURRICULUM.map(p => p.id);
+  const allSelected = allPhaseIds.every(id => selected.has(id));
+  const noneSelected = selected.size === 0;
+
+  const handleTogglePhase = (phaseId) => {
+    const newSel = new Set(selected);
+    if (newSel.has(phaseId)) newSel.delete(phaseId);
+    else newSel.add(phaseId);
+    setSelected(newSel);
+  };
+
+  const handleToggleCategory = (cat) => {
+    const phasesInCat = CURRICULUM.filter(p => p.category === cat).map(p => p.id);
+    const allInCatSelected = phasesInCat.every(id => selected.has(id));
+    const newSel = new Set(selected);
+    if (allInCatSelected) {
+      phasesInCat.forEach(id => newSel.delete(id));
+    } else {
+      phasesInCat.forEach(id => newSel.add(id));
+    }
+    setSelected(newSel);
+  };
+
+  const handleSelectAll = () => {
+    if (allSelected) setSelected(new Set());
+    else setSelected(new Set(allPhaseIds));
+  };
+
+  const selectedHours = CURRICULUM.filter(p => selected.has(p.id)).reduce((s, p) => s + p.totalHours, 0);
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#080810', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif' }}>
+      <div style={{ background: '#0f0f1e', border: '1px solid #1e1e35', borderRadius: '20px', padding: '44px', maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+        <div style={{ fontSize: '32px', marginBottom: '10px' }}>🎯</div>
+        <h1 style={{ color: 'white', fontSize: '26px', fontWeight: '800', margin: '0 0 8px', letterSpacing: '-0.02em' }}>Choose What to Learn</h1>
+        <p style={{ color: '#64748b', fontSize: '14px', margin: '0 0 24px', lineHeight: 1.6 }}>
+          Everyone has different goals. Select the phases you want to learn — your plan will adapt to your choices.
+        </p>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <button onClick={handleSelectAll}
+            style={{ padding: '5px 12px', fontSize: '12px', fontWeight: '600', border: '1px solid #1e1e30', background: allSelected ? '#818cf8' : '#0a0a1c', color: allSelected ? 'white' : '#4b5563', borderRadius: '8px', cursor: 'pointer' }}>
+            {allSelected ? '✓ All Selected' : 'Select All'}
+          </button>
+          <div style={{ color: '#475569', fontSize: '13px' }}>
+            {selected.size} / {allPhaseIds.length} phases ({selectedHours}h total)
+          </div>
+        </div>
+
+        {categories.map(cat => {
+          const phasesInCat = CURRICULUM.filter(p => p.category === cat);
+          const catSelected = phasesInCat.filter(p => selected.has(p.id)).length;
+          return (
+            <div key={cat} style={{ marginBottom: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                <input type="checkbox" id={`cat-${cat}`} 
+                  checked={catSelected === phasesInCat.length && catSelected > 0}
+                  onChange={() => handleToggleCategory(cat)}
+                  style={{ accentColor: '#818cf8', cursor: 'pointer', width: '16px', height: '16px' }} />
+                <label htmlFor={`cat-${cat}`} style={{ color: '#cbd5e1', fontSize: '13px', fontWeight: '600', cursor: 'pointer', flex: 1 }}>
+                  {cat}
+                </label>
+                <span style={{ color: '#334155', fontSize: '11px' }}>
+                  {catSelected}/{phasesInCat.length}
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingLeft: '26px' }}>
+                {phasesInCat.map(phase => {
+                  const isSelected = selected.has(phase.id);
+                  return (
+                    <div key={phase.id} onClick={() => handleTogglePhase(phase.id)}
+                      style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '12px', background: isSelected ? phase.color + '15' : 'transparent', border: `1px solid ${isSelected ? phase.color + '44' : 'transparent'}`, borderRadius: '10px', cursor: 'pointer', transition: 'all 0.15s' }}
+                      onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = '#131326'; e.currentTarget.style.borderColor = phase.color + '33'; }}
+                      onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}>
+                      <input type="checkbox" checked={isSelected} onChange={() => {}}
+                        style={{ accentColor: phase.color, cursor: 'pointer', width: '16px', height: '16px', marginTop: '2px', flexShrink: 0 }} />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ color: isSelected ? 'white' : '#cbd5e1', fontSize: '13px', fontWeight: '600', marginBottom: '3px' }}>
+                          P{phase.phase} — {phase.title}
+                        </div>
+                        <div style={{ color: '#334155', fontSize: '11px', marginBottom: '5px' }}>
+                          {phase.totalHours}h · 🏁 {phase.milestone}
+                        </div>
+                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                          {phase.topics.slice(0, 3).map(t => (
+                            <span key={t.id} style={{ background: '#0e0e1a', color: '#334155', fontSize: '9px', padding: '2px 6px', borderRadius: '4px' }}>
+                              {t.title.length > 20 ? t.title.substring(0, 20) + '...' : t.title}
+                            </span>
+                          ))}
+                          {phase.topics.length > 3 && (
+                            <span style={{ background: '#0e0e1a', color: '#334155', fontSize: '9px', padding: '2px 6px', borderRadius: '4px' }}>
+                              +{phase.topics.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+
+        <button onClick={() => onSave(Array.from(selected))} disabled={noneSelected}
+          style={{ width: '100%', padding: '15px', background: noneSelected ? '#1a1a30' : 'linear-gradient(135deg,#818cf8,#a78bfa)', border: 'none', borderRadius: '12px', color: noneSelected ? '#334155' : 'white', fontWeight: '700', fontSize: '16px', cursor: noneSelected ? 'not-allowed' : 'pointer', opacity: noneSelected ? 0.5 : 1 }}>
+          {selected.size === 0 ? 'Select at least one phase' : `Continue with ${selected.size} phase${selected.size !== 1 ? 's' : ''} →`}
+        </button>
+      </div>
+    </div>
+  );
 }
 
 // ================================================================
@@ -256,7 +376,7 @@ function SetupScreen({ onSave }) {
         <div style={{ fontSize: '32px', marginBottom: '10px' }}>📚</div>
         <h1 style={{ color: 'white', fontSize: '26px', fontWeight: '800', margin: '0 0 8px', letterSpacing: '-0.02em' }}>Set Up Your Plan</h1>
         <p style={{ color: '#64748b', fontSize: '14px', margin: '0 0 36px', lineHeight: 1.6 }}>
-          Enter how much time per day you can study. Your full roadmap generates instantly and auto-adjusts as you make progress.
+          Enter how much time per day you can study. Your roadmap generates instantly and auto-adjusts as you make progress.
         </p>
 
         {[
@@ -627,9 +747,10 @@ function ScheduleView({ schedule, progress, onToggle }) {
 // ================================================================
 // RESOURCES VIEW
 // ================================================================
-function ResourcesView() {
-  const [activeId, setActiveId] = useState('p1');
-  const phase = CURRICULUM.find(p => p.id === activeId);
+function ResourcesView({ selectedPhases }) {
+  const [activeId, setActiveId] = useState(selectedPhases && selectedPhases.length > 0 ? selectedPhases[0] : 'p1');
+  const selectedCurr = selectedPhases ? CURRICULUM.filter(p => selectedPhases.includes(p.id)) : CURRICULUM;
+  const phase = selectedCurr.find(p => p.id === activeId);
   const tIcons = { Video: '▶', Course: '📚', Interactive: '🎮', Docs: '📄', Article: '📰' };
   const tColors = { Video: '#818cf8', Course: '#34d399', Interactive: '#fb923c', Docs: '#22d3ee', Article: '#a78bfa' };
   const f = { fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif' };
@@ -640,7 +761,7 @@ function ResourcesView() {
       <p style={{ color: '#475569', fontSize: '13px', marginBottom: '24px' }}>100% free. Click any card to open it in a new tab.</p>
 
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '26px' }}>
-        {CURRICULUM.map(p => (
+        {selectedCurr.map(p => (
           <button key={p.id} onClick={() => setActiveId(p.id)}
             style={{ padding: '5px 12px', borderRadius: '20px', border: `1px solid ${activeId === p.id ? 'transparent' : '#141420'}`, background: activeId === p.id ? p.color : '#0f0f1e', color: activeId === p.id ? 'white' : '#4b5563', fontSize: '11px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.15s' }}>
             {p.title}
@@ -688,20 +809,35 @@ function ResourcesView() {
 // ================================================================
 // SETTINGS VIEW
 // ================================================================
-function SettingsView({ settings, onSave, onReset }) {
+function SettingsView({ settings, onSave, onReset, onChangeTopics, selectedPhases, stats }) {
   const [wd, setWd] = useState(settings.weekdayHours);
   const [we, setWe] = useState(settings.weekendHours);
   const [confirm, setConfirm] = useState(false);
   const changed = wd !== settings.weekdayHours || we !== settings.weekendHours;
   const newW = parseFloat((wd * 5 + we * 2).toFixed(1));
   const oldW = parseFloat((settings.weekdayHours * 5 + settings.weekendHours * 2).toFixed(1));
-  const newWeeks = Math.ceil(TOTAL_HOURS / newW);
+  const newWeeks = Math.ceil(stats.totalHours / newW);
   const f = { fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif' };
 
   return (
     <div style={{ ...f, padding: '28px 20px', maxWidth: '480px', margin: '0 auto' }}>
       <h2 style={{ color: 'white', fontSize: '20px', fontWeight: '800', marginBottom: '6px' }}>Settings</h2>
-      <p style={{ color: '#475569', fontSize: '13px', marginBottom: '28px' }}>Adjust your hours — the schedule recalculates automatically.</p>
+      <p style={{ color: '#475569', fontSize: '13px', marginBottom: '28px' }}>Customize your learning path.</p>
+
+      <div style={{ background: '#0f0f1e', border: '1px solid #141420', borderRadius: '14px', padding: '24px', marginBottom: '14px' }}>
+        <div style={{ color: '#64748b', fontSize: '11px', fontWeight: '700', letterSpacing: '0.07em', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>LEARNING TOPICS</span>
+          <span style={{ color: '#334155', fontSize: '12px', fontWeight: '400', letterSpacing: 'normal' }}>
+            {selectedPhases ? selectedPhases.length : 0} phases · {stats.totalHours}h
+          </span>
+        </div>
+        <button onClick={onChangeTopics}
+          style={{ width: '100%', padding: '12px', background: '#0a0a1c', border: '1px solid #1e1e30', borderRadius: '10px', color: '#818cf8', fontWeight: '600', fontSize: '14px', cursor: 'pointer', transition: 'all 0.15s' }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#131326'; e.currentTarget.style.borderColor = '#818cf8'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = '#0a0a1c'; e.currentTarget.style.borderColor = '#1e1e30'; }}>
+          ✏ Change Topics
+        </button>
+      </div>
 
       <div style={{ background: '#0f0f1e', border: '1px solid #141420', borderRadius: '14px', padding: '24px', marginBottom: '14px' }}>
         <div style={{ color: '#64748b', fontSize: '11px', fontWeight: '700', letterSpacing: '0.07em', marginBottom: '20px' }}>STUDY HOURS</div>
@@ -778,15 +914,19 @@ function SettingsView({ settings, onSave, onReset }) {
 export default function App() {
   const [view, setView] = useState('dashboard');
   const [settings, setSettings] = useState(null);
+  const [selectedPhases, setSelectedPhases] = useState(null);
   const [progress, setProgress] = useState({});
   const [loaded, setLoaded] = useState(false);
   const [showSetup, setShowSetup] = useState(false);
+  const [showTopicSelection, setShowTopicSelection] = useState(false);
 
   useEffect(() => {
     async function init() {
       const s = await sget(SK.settings);
+      const sp = await sget(SK.selectedPhases);
       const p = await sget(SK.progress);
       if (s) setSettings(s); else setShowSetup(true);
+      if (sp) setSelectedPhases(sp); else setShowTopicSelection(!s);
       if (p) setProgress(p);
       setLoaded(true);
     }
@@ -799,25 +939,32 @@ export default function App() {
   }, [settings]);
 
   const schedule = useMemo(() => {
-    if (!weeklyHours) return [];
-    return buildSchedule(weeklyHours, progress);
-  }, [weeklyHours, progress]);
+    if (!weeklyHours || !selectedPhases || selectedPhases.length === 0) return [];
+    return buildSchedule(weeklyHours, selectedPhases, progress);
+  }, [weeklyHours, selectedPhases, progress]);
 
   const stats = useMemo(() => {
-    const all = CURRICULUM.flatMap(p => p.topics);
+    const selectedCurr = CURRICULUM.filter(p => selectedPhases && selectedPhases.includes(p.id));
+    const all = selectedCurr.flatMap(p => p.topics);
     return {
       totalTopics: all.length,
       doneTopics: all.filter(t => progress[t.id] === 'done').length,
-      totalHours: TOTAL_HOURS,
-      doneHours: CURRICULUM.reduce((s, p) => s + p.topics.filter(t => progress[t.id] === 'done').reduce((a, t) => a + t.hours, 0), 0),
+      totalHours: selectedCurr.reduce((s, p) => s + p.totalHours, 0),
+      doneHours: selectedCurr.reduce((s, p) => s + p.topics.filter(t => progress[t.id] === 'done').reduce((a, t) => a + t.hours, 0), 0),
     };
-  }, [progress]);
+  }, [progress, selectedPhases]);
 
   const handleToggle = useCallback(async (topicId) => {
     const newP = { ...progress, [topicId]: progress[topicId] === 'done' ? '' : 'done' };
     setProgress(newP);
     await sset(SK.progress, newP);
   }, [progress]);
+
+  const handleSaveTopicSelection = async (selected) => {
+    setSelectedPhases(selected);
+    await sset(SK.selectedPhases, selected);
+    setShowTopicSelection(false);
+  };
 
   const handleSaveSettings = async (s) => {
     setSettings(s);
@@ -836,6 +983,8 @@ export default function App() {
     </div>
   );
 
+  if (showTopicSelection) return <TopicSelectionScreen onSave={handleSaveTopicSelection} />;
+
   if (showSetup) return <SetupScreen onSave={handleSaveSettings} />;
 
   return (
@@ -843,8 +992,8 @@ export default function App() {
       <Nav view={view} setView={setView} done={stats.doneTopics} total={stats.totalTopics} />
       {view === 'dashboard' && <Dashboard schedule={schedule} stats={stats} weeklyHours={weeklyHours} progress={progress} onToggle={handleToggle} />}
       {view === 'schedule' && <ScheduleView schedule={schedule} progress={progress} onToggle={handleToggle} />}
-      {view === 'resources' && <ResourcesView />}
-      {view === 'settings' && <SettingsView settings={settings} onSave={handleSaveSettings} onReset={handleReset} />}
+      {view === 'resources' && <ResourcesView selectedPhases={selectedPhases} />}
+      {view === 'settings' && <SettingsView settings={settings} onSave={handleSaveSettings} onReset={handleReset} onChangeTopics={() => setShowTopicSelection(true)} selectedPhases={selectedPhases} stats={stats} />}
     </div>
   );
 }
