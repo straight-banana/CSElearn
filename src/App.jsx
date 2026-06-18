@@ -135,7 +135,24 @@ const CURRICULUM = [
     ]
   },
   {
-    id: 'p9', phase: 9, title: 'AI / ML — Intern Level', category: 'AI/ML', totalHours: 45, color: '#f97316',
+    id: 'p9', phase: 9, title: 'Deployment & Cloud', category: 'DevOps', totalHours: 24, color: '#60a5fa',
+    milestone: 'Deploy a real app on Linux and cloud platforms. Set up domains, SSL, CI/CD, and managed databases.',
+    resources: [
+      { title: 'Vercel Docs — Deployments', url: 'https://vercel.com/docs/deployments', type: 'Docs', duration: 'Reference' },
+      { title: 'MongoDB Atlas Docs', url: 'https://www.mongodb.com/docs/atlas/', type: 'Docs', duration: 'Reference' },
+      { title: 'DigitalOcean Tutorials', url: 'https://www.digitalocean.com/community/tutorials', type: 'Article', duration: 'Reference' },
+      { title: 'AWS Getting Started', url: 'https://aws.amazon.com/getting-started/', type: 'Docs', duration: 'Reference' },
+    ],
+    topics: [
+      { id: 't9_1', title: 'Linux server basics — SSH, packages, services', hours: 5, note: 'Ubuntu server, SSH keys, systemctl, logs, permissions' },
+      { id: 't9_2', title: 'Deploy frontend on Vercel', hours: 4, note: 'Builds, env vars, previews, custom domains, rollbacks' },
+      { id: 't9_3', title: 'MongoDB Atlas — hosted database setup', hours: 4, note: 'Cluster setup, users, IP allowlist, connection strings' },
+      { id: 't9_4', title: 'Deploy backend on DigitalOcean or AWS', hours: 6, note: 'Droplets/EC2, Nginx reverse proxy, PM2, firewall rules' },
+      { id: 't9_5', title: 'Production workflow — CI/CD, monitoring, SSL', hours: 5, note: 'GitHub Actions, HTTPS with Let\'s Encrypt, uptime checks, logs' },
+    ]
+  },
+  {
+    id: 'p10', phase: 10, title: 'AI / ML — Intern Level', category: 'AI/ML', totalHours: 45, color: '#f97316',
     milestone: 'Train a digit classifier + sentiment model in PyTorch. Explain backprop and gradient descent clearly.',
     resources: [
       { title: '3Blue1Brown — Neural Networks Series', url: 'https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi', type: 'Video', duration: '~3.5h' },
@@ -145,17 +162,17 @@ const CURRICULUM = [
       { title: 'PyTorch Official Beginner Tutorials', url: 'https://pytorch.org/tutorials/beginner/basics/intro.html', type: 'Docs', duration: '~5h' },
     ],
     topics: [
-      { id: 't9_1', title: 'Visual foundation — 3B1B Neural Networks', hours: 4, note: 'What a neural net is, how backprop works visually' },
-      { id: 't9_2', title: 'ML concepts — cost, gradient descent, logistic regression', hours: 8, note: 'Andrew Ng Week 1-3: supervised learning, optimization' },
-      { id: 't9_3', title: 'Fast.ai — practical DL, transfer learning', hours: 10, note: 'Lessons 1-4: image classifiers, training loops' },
-      { id: 't9_4', title: 'Karpathy — micrograd (autograd from scratch)', hours: 6, note: 'Build backpropagation engine from scratch' },
-      { id: 't9_5', title: 'Karpathy — makemore (MLP language model)', hours: 7, note: 'Bigram to MLP, embeddings, batching' },
-      { id: 't9_6', title: 'PyTorch fundamentals + MNIST classifier', hours: 6, note: 'Tensors, datasets, dataloaders, training loop' },
-      { id: 't9_7', title: 'Capstone: sentiment classifier on real data', hours: 4, note: 'Kaggle dataset, train, evaluate, push to GitHub' },
+      { id: 't10_1', title: 'Visual foundation — 3B1B Neural Networks', hours: 4, note: 'What a neural net is, how backprop works visually' },
+      { id: 't10_2', title: 'ML concepts — cost, gradient descent, logistic regression', hours: 8, note: 'Andrew Ng Week 1-3: supervised learning, optimization' },
+      { id: 't10_3', title: 'Fast.ai — practical DL, transfer learning', hours: 10, note: 'Lessons 1-4: image classifiers, training loops' },
+      { id: 't10_4', title: 'Karpathy — micrograd (autograd from scratch)', hours: 6, note: 'Build backpropagation engine from scratch' },
+      { id: 't10_5', title: 'Karpathy — makemore (MLP language model)', hours: 7, note: 'Bigram to MLP, embeddings, batching' },
+      { id: 't10_6', title: 'PyTorch fundamentals + MNIST classifier', hours: 6, note: 'Tensors, datasets, dataloaders, training loop' },
+      { id: 't10_7', title: 'Capstone: sentiment classifier on real data', hours: 4, note: 'Kaggle dataset, train, evaluate, push to GitHub' },
     ]
   },
   {
-    id: 'p10', phase: 10, title: 'Large Language Models', category: 'AI/ML', totalHours: 30, color: '#a3e635',
+    id: 'p11', phase: 11, title: 'Large Language Models', category: 'AI/ML', totalHours: 30, color: '#a3e635',
     milestone: 'Train mini-GPT on custom text. Understand attention, tokenization, RLHF conceptually.',
     resources: [
       { title: '3Blue1Brown — Attention & Transformers', url: 'https://www.youtube.com/watch?v=wjZofJX0v4M', type: 'Video', duration: '~30min' },
@@ -163,16 +180,16 @@ const CURRICULUM = [
       { title: 'Stanford CS336 — Language Modeling (selected)', url: 'https://www.youtube.com/playlist?list=PLoROMvodv4rOY23NIoShKxqXcH9lxrWaK', type: 'Video', duration: '5 lectures' },
     ],
     topics: [
-      { id: 't10_1', title: 'Attention & transformers — visual intuition', hours: 4, note: 'Self-attention, Q/K/V, positional encoding' },
-      { id: 't10_2', title: 'Tokenization — BPE, vocabulary, encoding', hours: 3, note: 'How text becomes tokens, vocab size tradeoffs' },
-      { id: 't10_3', title: 'Build GPT from scratch (Karpathy code-along)', hours: 8, note: 'Bigram to transformer, type every line yourself' },
-      { id: 't10_4', title: 'Scaling laws & training dynamics', hours: 4, note: 'CS336: how scale affects capability' },
-      { id: 't10_5', title: 'RLHF, fine-tuning, alignment basics', hours: 4, note: 'CS336: how ChatGPT-style training works' },
-      { id: 't10_6', title: 'Train mini-GPT on custom text dataset', hours: 7, note: 'Pick corpus, train, evaluate, push to GitHub' },
+      { id: 't11_1', title: 'Attention & transformers — visual intuition', hours: 4, note: 'Self-attention, Q/K/V, positional encoding' },
+      { id: 't11_2', title: 'Tokenization — BPE, vocabulary, encoding', hours: 3, note: 'How text becomes tokens, vocab size tradeoffs' },
+      { id: 't11_3', title: 'Build GPT from scratch (Karpathy code-along)', hours: 8, note: 'Bigram to transformer, type every line yourself' },
+      { id: 't11_4', title: 'Scaling laws & training dynamics', hours: 4, note: 'CS336: how scale affects capability' },
+      { id: 't11_5', title: 'RLHF, fine-tuning, alignment basics', hours: 4, note: 'CS336: how ChatGPT-style training works' },
+      { id: 't11_6', title: 'Train mini-GPT on custom text dataset', hours: 7, note: 'Pick corpus, train, evaluate, push to GitHub' },
     ]
   },
   {
-    id: 'p11', phase: 11, title: 'Cybersecurity Basics', category: 'Security', totalHours: 25, color: '#f87171',
+    id: 'p12', phase: 12, title: 'Cybersecurity Basics', category: 'Security', totalHours: 25, color: '#f87171',
     milestone: 'Complete 5+ TryHackMe beginner rooms. Discuss common web vulnerabilities in your own backend.',
     resources: [
       { title: 'NetworkChuck — Cybersecurity Full Course', url: 'https://www.youtube.com/watch?v=hXSFdwIOfnE', type: 'Video', duration: '~6h' },
@@ -180,11 +197,11 @@ const CURRICULUM = [
       { title: 'TryHackMe (free tier)', url: 'https://tryhackme.com/paths', type: 'Interactive', duration: 'Alongside' },
     ],
     topics: [
-      { id: 't11_1', title: 'Security fundamentals — CIA triad, attack types', hours: 4, note: 'Confidentiality/Integrity/Availability, malware types' },
-      { id: 't11_2', title: 'Network security — firewalls, VPNs, IDS', hours: 4, note: 'Packet filtering, VPN protocols, intrusion detection' },
-      { id: 't11_3', title: 'Web security — OWASP Top 10', hours: 5, note: 'SQLi, XSS, CSRF, IDOR — examples from your backend' },
-      { id: 't11_4', title: 'Linux for security — Kali, CLI tools', hours: 5, note: 'Kali in VirtualBox, nmap, netcat, enumeration' },
-      { id: 't11_5', title: 'TryHackMe labs — beginner path', hours: 7, note: '5+ rooms: Intro Networking, Linux Fundamentals, OWASP' },
+      { id: 't12_1', title: 'Security fundamentals — CIA triad, attack types', hours: 4, note: 'Confidentiality/Integrity/Availability, malware types' },
+      { id: 't12_2', title: 'Network security — firewalls, VPNs, IDS', hours: 4, note: 'Packet filtering, VPN protocols, intrusion detection' },
+      { id: 't12_3', title: 'Web security — OWASP Top 10', hours: 5, note: 'SQLi, XSS, CSRF, IDOR — examples from your backend' },
+      { id: 't12_4', title: 'Linux for security — Kali, CLI tools', hours: 5, note: 'Kali in VirtualBox, nmap, netcat, enumeration' },
+      { id: 't12_5', title: 'TryHackMe labs — beginner path', hours: 7, note: '5+ rooms: Intro Networking, Linux Fundamentals, OWASP' },
     ]
   },
 ];
@@ -235,7 +252,7 @@ async function sget(k) {
   try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; }
 }
 async function sset(k, v) {
-  try { localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  try { localStorage.setItem(k, JSON.stringify(v)); } catch (error) { void error; }
 }
 
 // ================================================================
@@ -420,6 +437,19 @@ function SetupScreen({ onSave }) {
   );
 }
 
+function ScheduleModeToggle({ mode, setMode }) {
+  return (
+    <div style={{ display: 'flex', gap: '3px', background: '#0f0f1e', border: '1px solid #141420', borderRadius: '8px', padding: '3px', flexShrink: 0 }}>
+      {['weeks', 'phases'].map(m => (
+        <button key={m} onClick={() => setMode(m)}
+          style={{ padding: '5px 14px', borderRadius: '6px', border: 'none', background: mode === m ? '#818cf8' : 'transparent', color: mode === m ? 'white' : '#4b5563', fontSize: '12px', fontWeight: '600', cursor: 'pointer', textTransform: 'capitalize', transition: 'all 0.15s' }}>
+          {m}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 // ================================================================
 // NAV
 // ================================================================
@@ -584,17 +614,6 @@ function ScheduleView({ schedule, progress, onToggle }) {
   const [expandedPhase, setExpandedPhase] = useState({});
   const f = { fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif' };
 
-  const ModeToggle = () => (
-    <div style={{ display: 'flex', gap: '3px', background: '#0f0f1e', border: '1px solid #141420', borderRadius: '8px', padding: '3px', flexShrink: 0 }}>
-      {['weeks', 'phases'].map(m => (
-        <button key={m} onClick={() => setMode(m)}
-          style={{ padding: '5px 14px', borderRadius: '6px', border: 'none', background: mode === m ? '#818cf8' : 'transparent', color: mode === m ? 'white' : '#4b5563', fontSize: '12px', fontWeight: '600', cursor: 'pointer', textTransform: 'capitalize', transition: 'all 0.15s' }}>
-          {m}
-        </button>
-      ))}
-    </div>
-  );
-
   if (mode === 'phases') {
     return (
       <div style={{ ...f, padding: '28px 20px', maxWidth: '760px', margin: '0 auto' }}>
@@ -603,7 +622,7 @@ function ScheduleView({ schedule, progress, onToggle }) {
             <h2 style={{ color: 'white', fontSize: '20px', fontWeight: '800', margin: '0 0 4px' }}>Full Roadmap</h2>
             <p style={{ color: '#475569', fontSize: '13px', margin: 0 }}>Click a phase to expand. Check topics — plan auto-adjusts.</p>
           </div>
-          <ModeToggle />
+          <ScheduleModeToggle mode={mode} setMode={setMode} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {CURRICULUM.map(phase => {
@@ -679,7 +698,7 @@ function ScheduleView({ schedule, progress, onToggle }) {
             {schedule.length > 0 ? `${schedule.length} weeks remaining — auto-adjusts as you check off topics` : 'Nothing left in the schedule'}
           </p>
         </div>
-        <ModeToggle />
+        <ScheduleModeToggle mode={mode} setMode={setMode} />
       </div>
 
       {schedule.length === 0 ? (
